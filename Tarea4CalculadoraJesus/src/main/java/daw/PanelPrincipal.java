@@ -10,7 +10,6 @@ import javax.swing.JTextArea;
 
 public class PanelPrincipal extends JPanel implements ActionListener {
 
-    // Atributos de la clase (privados)
     private PanelBotones botonera;
     private JTextArea areaTexto;
     private String operando1 = "";
@@ -18,23 +17,17 @@ public class PanelPrincipal extends JPanel implements ActionListener {
     private String operador = "";
     private boolean nuevoNumero = true;
 
-    // Constructor
     public PanelPrincipal() {
         initComponents();
     }
 
-    // Se inicializan los componentes gráficos y se colocan en el panel
     private void initComponents() {
-        // Creamos el panel de botones
         botonera = new PanelBotones();
-        // Creamos el área de texto
         areaTexto = new JTextArea(10, 50);
         areaTexto.setEditable(false);
         areaTexto.setBackground(Color.white);
 
-        //Establecemos layout del panel principal
         this.setLayout(new BorderLayout());
-        // Colocamos la botonera y el área texto
         this.add(areaTexto, BorderLayout.NORTH);
         this.add(botonera, BorderLayout.SOUTH);
 
@@ -48,22 +41,60 @@ public class PanelPrincipal extends JPanel implements ActionListener {
         JButton botonPulsado = (JButton) ae.getSource();
         String textoBoton = botonPulsado.getText();
 
-        if (textoBoton.matches("[0-9]")) {
-            if (nuevoNumero) {
-                areaTexto.setText(textoBoton);
-                nuevoNumero = false;
-            } else {
-                areaTexto.append(textoBoton);
+        if ("0123456789".contains(textoBoton)) {
+            // Números siempre se agregan al final
+            areaTexto.append(textoBoton);
+            nuevoNumero = false;
+
+        } else if ("+-*/".contains(textoBoton)) {
+            String textoCompleto = areaTexto.getText();
+            int ultimoSalto = textoCompleto.lastIndexOf('\n');
+            String ultimaLinea = (ultimoSalto == -1) ? textoCompleto : textoCompleto.substring(ultimoSalto + 1);
+
+            // Si el botón es "-" y:
+            // - la línea está vacía (inicio del número) o
+            // - la última línea termina en operador
+            // Entonces es signo negativo, no operador
+            if (textoBoton.equals("-")) {
+                if (ultimaLinea.isEmpty() || ultimaLinea.endsWith("+") || ultimaLinea.endsWith("-")
+                        || ultimaLinea.endsWith("*") || ultimaLinea.endsWith("/")) {
+                    areaTexto.append("-");
+                    nuevoNumero = false;
+                    return;
+                }
             }
-        } else if (textoBoton.matches("[+\\-*/]")) {
-            operando1 = areaTexto.getText();
-            operador = textoBoton;
-            nuevoNumero = true;
+
+            // Si ya hay resultado (con '=') en la última línea, iniciamos nueva operación
+            if (ultimaLinea.contains("=")) {
+                areaTexto.append("\n");
+                ultimaLinea = "";  // Empezamos de nuevo en nueva línea
+            }
+
+            // Añadimos operador con un espacio antes y después para legibilidad
+            areaTexto.append(" " + textoBoton + " ");
+            nuevoNumero = false;
+
         } else if (textoBoton.equals("=")) {
-            operando2 = areaTexto.getText();
+            String textoCompleto = areaTexto.getText();
+            int ultimoSalto = textoCompleto.lastIndexOf('\n');
+            String ultimaLinea = (ultimoSalto == -1) ? textoCompleto : textoCompleto.substring(ultimoSalto + 1);
+
+            // Parsear operandos y operador con posible número negativo
+            String[] partes = ultimaLinea.split(" ");
+
+            if (partes.length >= 3) {
+                operando1 = partes[0];
+                operador = partes[1];
+                operando2 = partes[2];
+            } else {
+                // Si no hay suficientes partes, no hacemos nada
+                return;
+            }
+
             double resultado = calcularResultado();
-            areaTexto.setText(Double.toString(resultado));
+            areaTexto.append(" = " + resultado + "\n");
             nuevoNumero = true;
+
         } else if (textoBoton.equals("C")) {
             areaTexto.setText("");
             operando1 = "";
