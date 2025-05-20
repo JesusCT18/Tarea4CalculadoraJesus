@@ -51,9 +51,9 @@ public class PanelPrincipal extends JPanel implements ActionListener {
             int ultimoSalto = textoCompleto.lastIndexOf('\n');
             String ultimaLinea = (ultimoSalto == -1) ? textoCompleto : textoCompleto.substring(ultimoSalto + 1);
 
-            // Si el botón es "-" y:
-            // - la línea está vacía (inicio del número) o
-            // - la última línea termina en operador
+            // Si el boton es "-" y:
+            // la linea esta vacia (inicio del número) o
+            // la ultima linea termina en operador
             // Entonces es signo negativo, no operador
             if (textoBoton.equals("-")) {
                 if (ultimaLinea.isEmpty() || ultimaLinea.endsWith("+") || ultimaLinea.endsWith("-")
@@ -64,13 +64,13 @@ public class PanelPrincipal extends JPanel implements ActionListener {
                 }
             }
 
-            // Si ya hay resultado (con '=') en la última línea, iniciamos nueva operación
+            // Si ya hay resultado (con '=') en la ultima linea, iniciamos nueva operacion
             if (ultimaLinea.contains("=")) {
                 areaTexto.append("\n");
-                ultimaLinea = "";  // Empezamos de nuevo en nueva línea
+                ultimaLinea = "";  // Empezamos de nuevo en nueva linea
             }
 
-            // Añadimos operador con un espacio antes y después para legibilidad
+            // Añadimos operador con un espacio antes y despues para legibilidad
             areaTexto.append(" " + textoBoton + " ");
             nuevoNumero = false;
 
@@ -79,7 +79,7 @@ public class PanelPrincipal extends JPanel implements ActionListener {
             int ultimoSalto = textoCompleto.lastIndexOf('\n');
             String ultimaLinea = (ultimoSalto == -1) ? textoCompleto : textoCompleto.substring(ultimoSalto + 1);
 
-            // Parsear operandos y operador con posible número negativo
+            // Parsear operandos y operador con posible numero negativo
             String[] partes = ultimaLinea.split(" ");
 
             if (partes.length >= 3) {
